@@ -1,3 +1,5 @@
+import personsServices from "../services/persons"
+
 const AddForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPersons }) => {
     const handleChangeInName = (event) => {
         setNewName(event.target.value)
@@ -10,14 +12,28 @@ const AddForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPer
     const addPerson = (event) => {
         event.preventDefault()
         if (persons.map(person => person.name).includes(newName)) {
-            alert(`${newName} is already added to phonebook`)
+            if (confirm(`${newName} is already added to phonebook, replace the old number with the new one?`)) {
+                const id = persons.find(person => person.name == newName).id
+                const newPerson = {
+                    name: newName,
+                    number: newNumber
+                }
+                personsServices.update(id, newPerson).then(updatedPerson => {
+                    const updatedPersons = persons.map(person => person.name === newName ? updatedPerson : person)
+                    setPersons(updatedPersons)
+                })
+            }
+
         }
         else {
             const newPerson = {
                 name: newName,
                 number: newNumber
             }
-            setPersons(persons.concat(newPerson))
+            personsServices.create(newPerson).then(createdPerson => {
+                setPersons(persons.concat(createdPerson))
+            })
+
             setNewName('')
             setNewNumber('')
         }

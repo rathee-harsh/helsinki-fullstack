@@ -1,9 +1,24 @@
-const Display = ({ persons, filter }) => {
+import personsServices from "../services/persons"
+
+const Display = ({ persons, filter, setPersons }) => {
     const filteredPeople = () => {
         return persons.filter(person => person.name.includes(filter))
     }
 
-    return (filteredPeople().map((person, i) => <p key={i}>{person.name} {person.number}</p>))
+    const handleDelete = (id) => {
+        personsServices.remove(id).then(_ => {
+            setPersons(persons.filter(p => p.id !== id))
+        })
+    }
+
+    return (filteredPeople().map(person =>
+        <div key={person.id}>
+            <p>
+                {person.name} {person.number}
+                <button onClick={() => handleDelete(person.id)}>delete</button>
+            </p>
+        </div>
+    ))
 }
 
 export default Display
