@@ -1,6 +1,7 @@
 import personsServices from "../services/persons"
+import Notifications from './Notifications'
 
-const AddForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPersons }) => {
+const AddForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPersons, setSuccessMessage, setErrorMessage }) => {
     const handleChangeInName = (event) => {
         setNewName(event.target.value)
     }
@@ -21,6 +22,11 @@ const AddForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPer
                 personsServices.update(id, newPerson).then(updatedPerson => {
                     const updatedPersons = persons.map(person => person.name === newName ? updatedPerson : person)
                     setPersons(updatedPersons)
+                }).catch(_ => {
+                    setErrorMessage(`Information of ${newName} has already been removed from server`)
+                    setTimeout(() => {
+                        setErrorMessage(null)
+                    }, 5000)
                 })
             }
 
@@ -32,8 +38,11 @@ const AddForm = ({ newName, setNewName, newNumber, setNewNumber, persons, setPer
             }
             personsServices.create(newPerson).then(createdPerson => {
                 setPersons(persons.concat(createdPerson))
+                setSuccessMessage(`Added ${newName}`)
+                setTimeout(() => {
+                    setSuccessMessage(null)
+                }, 5000)
             })
-
             setNewName('')
             setNewNumber('')
         }
